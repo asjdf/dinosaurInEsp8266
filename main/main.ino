@@ -5,19 +5,21 @@
 #define CACTI 100    //背景每秒走的格子数
 String serialTemp = "";
 
+int gameStart = 1;
 int bgPos = 0;  // 背景偏移
 long long lastDinosaurFlashTime;
 long long lastBgFlashTime;
 long long lastScreenFlashTime;
 long long lastCactiFlashTime;
+long long lastObstacleCreateTime;
 int screenFlashTime = 1000 / FPS;   // 屏幕的刷新时间间隔
 int bgFlashSpeed = 1000 / BGSPEED;  // 背景的刷新时间间隔ms
 int cactiFlashTime = 1000 / CACTI;  // 仙人掌的刷新时间间隔ms
 int dinosaurFlashTime = 100;        // 小恐龙的刷新时间间隔 单位ms
+int obstacleCreateTime = 500;  // 最短的障碍物生成间隔 防止难度过高
 int dinosaurState = 0;
 int cactiPos[128 + cacti_width] = {
     0};  // 仙人掌位置 0位置的时候仙人掌应该在屏幕之外
-
 void display() {
     Heltec.display->clear();
     // see http://blog.squix.org/2015/05/esp8266-nodemcu-how-to-create-xbm.html
@@ -56,6 +58,7 @@ void setup() {
     lastDinosaurFlashTime = millis();
     lastBgFlashTime = millis();
     lastCactiFlashTime = millis();
+    lastObstacleCreateTime = millis();
 }
 
 void loop() {
@@ -77,6 +80,13 @@ void loop() {
     if (millis() - lastScreenFlashTime >= screenFlashTime) {
         lastScreenFlashTime = millis();
         display();
+    }
+
+    if (gameStart && millis() - lastObstacleCreateTime >= obstacleCreateTime) {
+        // 随机生成障碍物
+        obstacleCreateTime = random(1000, 2000);
+        lastObstacleCreateTime = millis();
+        cactiPos[126 + cacti_width] = 1;
     }
 
     while (Serial.available() > 0) {
