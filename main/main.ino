@@ -1,3 +1,4 @@
+#include "ButtonController.h"
 #include "heltec.h"  // alias for `#include "SSD1306Wire.h"`
 #include "images.h"
 #define FPS 25
