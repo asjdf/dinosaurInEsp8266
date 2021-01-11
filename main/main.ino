@@ -2,16 +2,21 @@
 #include "images.h"
 #define FPS 25
 #define BGSPEED 100  //背景每秒走的格子数
+#define CACTI 100    //背景每秒走的格子数
 String serialTemp = "";
 
 int bgPos = 0;  // 背景偏移
 long long lastDinosaurFlashTime;
 long long lastBgFlashTime;
 long long lastScreenFlashTime;
+long long lastCactiFlashTime;
 int screenFlashTime = 1000 / FPS;   // 屏幕的刷新时间间隔
 int bgFlashSpeed = 1000 / BGSPEED;  // 背景的刷新时间间隔ms
+int cactiFlashTime = 1000 / CACTI;  // 仙人掌的刷新时间间隔ms
 int dinosaurFlashTime = 100;        // 小恐龙的刷新时间间隔 单位ms
 int dinosaurState = 0;
+int cactiPos[128 + cacti_width] = {
+    0};  // 仙人掌位置 0位置的时候仙人掌应该在屏幕之外
 
 void display() {
     Heltec.display->clear();
@@ -33,6 +38,12 @@ void display() {
                                     dinosaur2_bits);
             break;
     }
+    for (int i = 0; i < 128 + cacti_width; i++) {
+        if (cactiPos[i]) {
+            Heltec.display->drawXbm(i - cacti_width, 11, cacti_width,
+                                    cacti_height, cacti_bits);
+        }
+    }
     Heltec.display->display();
 }
 
@@ -44,6 +55,7 @@ void setup() {
     lastScreenFlashTime = millis();
     lastDinosaurFlashTime = millis();
     lastBgFlashTime = millis();
+    lastCactiFlashTime = millis();
 }
 
 void loop() {
@@ -54,6 +66,12 @@ void loop() {
     if (millis() - lastDinosaurFlashTime >= dinosaurFlashTime) {
         lastDinosaurFlashTime = millis();
         dinosaurState = (dinosaurState + 1) % 3;
+    }
+    if (millis() - lastCactiFlashTime >= cactiFlashTime) {
+        lastCactiFlashTime = millis();
+        for (int i = 0; i < 127 + cacti_width; i++) {
+            cactiPos[i] = cactiPos[i + 1];
+        }
     }
 
     if (millis() - lastScreenFlashTime >= screenFlashTime) {
@@ -67,7 +85,7 @@ void loop() {
             serialTemp += (char)inChar;
         }
         if (inChar == '\n') {
-            dinosaurFlashTime = serialTemp.toInt();
+            cactiPos[126 + cacti_width] = serialTemp.toInt();
             serialTemp = "";
         }
     }
