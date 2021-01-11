@@ -1,0 +1,2 @@
+# dinosaurInEsp8266
+运行在ESP8266上的仿chrome小恐龙的游戏机
