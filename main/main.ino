@@ -28,7 +28,7 @@ int screenFlashTime = 1000 / FPS;   // 屏幕的刷新时间间隔
 int bgFlashSpeed = 1000 / BGSPEED;  // 背景的刷新时间间隔ms
 int cactiFlashTime = 1000 / CACTI;  // 仙人掌的刷新时间间隔ms
 int dinosaurFlashTime = 100;        // 小恐龙的刷新时间间隔 单位ms
-int dinosaurHeightFlashTime = 30;   // 小恐龙高度的刷新时间间隔
+int dinosaurHeightFlashTime = 25;   // 小恐龙高度的刷新时间间隔
 int obstacleCreateTime = 500;  // 最短的障碍物生成间隔 防止难度过高
 int dinosaurState = 0;
 // 11格 1.5s走完上下全程
@@ -66,7 +66,7 @@ void display() {
     }
     if (gameStart) {
         Heltec.display->setTextAlignment(TEXT_ALIGN_RIGHT);
-        Heltec.display->setFont(DSEG14_Classic_Regular_10);
+        Heltec.display->setFont(DejaVu_Sans_10);
         Heltec.display->drawString(128, 0,
                                    String((millis() - gameStartTime) / 100));
     }
@@ -121,7 +121,7 @@ void loop() {
             serialTemp += (char)inChar;
         }
         if (inChar == '\n') {
-            jump = serialTemp.toInt();
+            dinosaurHeightFlashTime = serialTemp.toInt();
             serialTemp = "";
         }
     }
