@@ -6,11 +6,8 @@
 #define BGSPEED 100  //背景每秒走的格子数
 #define CACTI 100    //背景每秒走的格子数
 #define BUTTONPIN D3
-Button button0;      //新建按键
-void click();        //单击处理
-void doubleClick();  //双击处理
-void longPress();    //长按处理;
-void wakeUp();       //从休眠中唤醒
+Button button0;  //新建按键
+void click();    //单击处理
 String serialTemp = "";
 
 int gameStart = 1;
@@ -125,10 +122,6 @@ void loop() {
             serialTemp = "";
         }
     }
-    // if (digitalRead(BUTTONPIN) == 0) {
-    //     click();
-    // }
-    // Serial.println(digitalRead(BUTTONPIN));
     ButtonController::processing(&button0, digitalRead(BUTTONPIN), click, NULL,
                                  NULL, NULL, NULL);
 
