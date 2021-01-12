@@ -1,21 +1,29 @@
 #include "ButtonController.h"
+#include "fonts.h"
 #include "heltec.h"  // alias for `#include "SSD1306Wire.h"`
 #include "images.h"
 #define FPS 25
 #define BGSPEED 100  //背景每秒走的格子数
 #define CACTI 100    //背景每秒走的格子数
+#define BUTTONPIN D3
+Button button0;      //新建按键
+void click();        //单击处理
+void doubleClick();  //双击处理
+void longPress();    //长按处理;
+void wakeUp();       //从休眠中唤醒
 String serialTemp = "";
 
 int gameStart = 1;
 int jump = 0;   // 初始化跳跃
 int bgPos = 0;  // 背景偏移
 int dinosaurHeight = 11;
-long long lastDinosaurFlashTime;
-long long lastBgFlashTime;
-long long lastScreenFlashTime;
-long long lastCactiFlashTime;
-long long lastDinosaurHeightFlashTime;
-long long lastObstacleCreateTime;
+unsigned long gameStartTime;
+unsigned long lastDinosaurFlashTime;
+unsigned long lastBgFlashTime;
+unsigned long lastScreenFlashTime;
+unsigned long lastCactiFlashTime;
+unsigned long lastDinosaurHeightFlashTime;
+unsigned long lastObstacleCreateTime;
 int screenFlashTime = 1000 / FPS;   // 屏幕的刷新时间间隔
 int bgFlashSpeed = 1000 / BGSPEED;  // 背景的刷新时间间隔ms
 int cactiFlashTime = 1000 / CACTI;  // 仙人掌的刷新时间间隔ms
@@ -56,14 +64,19 @@ void display() {
                                     cacti_height, cacti_bits);
         }
     }
+    if (gameStart) {
+        Heltec.display->setTextAlignment(TEXT_ALIGN_RIGHT);
+        Heltec.display->setFont(DSEG14_Classic_Regular_10);
+        Heltec.display->drawString(128, 0,
+                                   String((millis() - gameStartTime) / 100));
+    }
     Heltec.display->display();
 }
 
 void setup() {
     Heltec.begin(true /*DisplayEnable Enable*/, true /*Serial Enable*/);
-
     Heltec.display->flipScreenVertically();
-    Heltec.display->setFont(ArialMT_Plain_10);
+    pinMode(BUTTONPIN, INPUT_PULLUP);  //内部上拉!等下接地!
     lastScreenFlashTime = millis();
     lastDinosaurFlashTime = millis();
     lastBgFlashTime = millis();
@@ -112,6 +125,13 @@ void loop() {
             serialTemp = "";
         }
     }
+    // if (digitalRead(BUTTONPIN) == 0) {
+    //     click();
+    // }
+    // Serial.println(digitalRead(BUTTONPIN));
+    ButtonController::processing(&button0, digitalRead(BUTTONPIN), click, NULL,
+                                 NULL, NULL, NULL);
+
     if (millis() - lastScreenFlashTime >= screenFlashTime) {
         lastScreenFlashTime = millis();
         display();
@@ -123,10 +143,22 @@ void loop() {
         hasObstacle += cactiPos[i];
     }
     if (gameStart && hasObstacle) {
-        if (dinosaurHeightPos[jump] < cacti_height) {
-            // gameStart = 0;
+        // 下面的+2是为了降低难度 狗头
+        if (dinosaurHeightPos[jump] + 2 < cacti_height) {
+            gameStart = 0;
             Serial.print(millis());
             Serial.println(" game over");
         }
+    }
+}
+
+void click() {
+    Serial.println("click");
+    if (gameStart && jump == 0) {
+        jump = 30;
+    }
+    if (!gameStart) {
+        gameStart = 1;
+        gameStartTime = millis();
     }
 }
