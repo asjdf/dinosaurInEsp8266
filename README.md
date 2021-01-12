@@ -2,6 +2,7 @@
 运行在ESP8266上的仿chrome小恐龙的游戏机
 
 ![效果图](https://i.loli.net/2021/01/12/ofxLGBl3uwyH8Ac.jpg)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fasjdf%2FdinosaurInEsp8266.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fasjdf%2FdinosaurInEsp8266?ref=badge_shield)
 
 
 
@@ -15,3 +16,7 @@
 
 有问题请提issue，我会尽快解决。
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fasjdf%2FdinosaurInEsp8266.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fasjdf%2FdinosaurInEsp8266?ref=badge_large)
