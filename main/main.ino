@@ -1,11 +1,13 @@
 #include "ButtonController.h"
 #include "fonts.h"
-#include "heltec.h"  // alias for `#include "SSD1306Wire.h"`
+// #include "heltec.h"  // alias for `#include "SSD1306Wire.h"`
+#include "SSD1306Wire.h"
+SSD1306Wire display(0x3c, 2, 14, 4, GEOMETRY_128_32);
 #include "images.h"
 #define FPS 25
 #define BGSPEED 100  //背景每秒走的格子数
 #define CACTI 100    //背景每秒走的格子数
-#define BUTTONPIN D3
+#define BUTTONPIN D6
 Button button0;  //新建按键
 void click();    //单击处理
 String serialTemp = "";
@@ -35,45 +37,47 @@ int dinosaurHeightPos[] = {0,  1,  2,  3,  5,  6,  7,  8,  9,  10, 10,
                            10, 9,  8,  7,  6,  5,  3,  2,  1};
 int cactiPos[128 + cacti_width] = {
     0};  // 仙人掌位置 0位置的时候仙人掌应该在屏幕之外
-void display() {
-    Heltec.display->clear();
+void screenUpdate() {
+    display.clear();
     // see http://blog.squix.org/2015/05/esp8266-nodemcu-how-to-create-xbm.html
     // on how to create xbm files
-    Heltec.display->drawXbm(bgPos, 23, bg_width, bg_height, bg_bits);
-    Heltec.display->drawXbm(255 + bgPos, 23, bg_width, bg_height, bg_bits);
+    display.drawXbm(bgPos, 23, bg_width, bg_height, bg_bits);
+    display.drawXbm(255 + bgPos, 23, bg_width, bg_height, bg_bits);
     switch (dinosaurState) {
         case 0:
-            Heltec.display->drawXbm(0, dinosaurHeight, dinosaur0_width,
-                                    dinosaur0_height, dinosaur0_bits);
+            display.drawXbm(0, dinosaurHeight, dinosaur0_width,
+                            dinosaur0_height, dinosaur0_bits);
             break;
         case 1:
-            Heltec.display->drawXbm(0, dinosaurHeight, dinosaur1_width,
-                                    dinosaur1_height, dinosaur1_bits);
+            display.drawXbm(0, dinosaurHeight, dinosaur1_width,
+                            dinosaur1_height, dinosaur1_bits);
             break;
         case 2:
-            Heltec.display->drawXbm(0, dinosaurHeight, dinosaur2_width,
-                                    dinosaur2_height, dinosaur2_bits);
+            display.drawXbm(0, dinosaurHeight, dinosaur2_width,
+                            dinosaur2_height, dinosaur2_bits);
             break;
     }
     for (int i = 0; i < 128 + cacti_width; i++) {
         if (cactiPos[i]) {
-            Heltec.display->drawXbm(i - cacti_width, 19, cacti_width,
-                                    cacti_height, cacti_bits);
+            display.drawXbm(i - cacti_width, 19, cacti_width, cacti_height,
+                            cacti_bits);
         }
     }
     if (gameStart) {
-        Heltec.display->setTextAlignment(TEXT_ALIGN_RIGHT);
-        Heltec.display->setFont(DejaVu_Sans_10);
-        Heltec.display->drawString(128, 0,
-                                   String((millis() - gameStartTime) / 100));
+        display.setTextAlignment(TEXT_ALIGN_RIGHT);
+        display.setFont(DejaVu_Sans_10);
+        display.drawString(128, 0, String((millis() - gameStartTime) / 100));
     }
-    Heltec.display->display();
+    display.display();
 }
 
 void setup() {
-    Heltec.begin(true /*DisplayEnable Enable*/, true /*Serial Enable*/);
-    Heltec.display->flipScreenVertically();
+    Serial.begin(115200);
+    display.init();
+    display.flipScreenVertically();
     pinMode(BUTTONPIN, INPUT_PULLUP);  //内部上拉!等下接地!
+    pinMode(D3, OUTPUT);
+    digitalWrite(D3, 0);
     lastScreenFlashTime = millis();
     lastDinosaurFlashTime = millis();
     lastBgFlashTime = millis();
@@ -127,7 +131,7 @@ void loop() {
 
     if (millis() - lastScreenFlashTime >= screenFlashTime) {
         lastScreenFlashTime = millis();
-        display();
+        screenUpdate();
     }
 
     // 判断是否碰撞障碍物
