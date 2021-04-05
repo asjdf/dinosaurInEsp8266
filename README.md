@@ -15,9 +15,3 @@
 如果是普通的esp8266（nodemcu）和SSD1306，请~~按照项目下的WIFI_Kit_8_Pinout_Diagram.pdf连接。~~自己焊接完了以后去程序改
 
 有问题请提issue，我会尽快解决。
-
-
-
-## License
-
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fasjdf%2FdinosaurInEsp8266.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fasjdf%2FdinosaurInEsp8266?ref=badge_large)
